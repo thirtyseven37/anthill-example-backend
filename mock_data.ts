@@ -2,7 +2,6 @@ import * as _ from "lodash";
 import { AntSourceEvent } from "@thirtyseven37/anthill";
 import { Parameter, Parking, Phrase, Product } from "./types";
 
-
 const products: Product[] = _.shuffle([
   { id: 600, name: "ax-176", parameters: [8, 2, 4] },
   { id: 2137, name: "1n4002", parameters: [] },

@@ -1,6 +1,5 @@
-import { Parameter, Parking, ParkingWithProductsAndPhrases, Phrase, Product, ProductWithTextParameter } from "./types";
 import * as R from "ramda";
-
+import { Parameter, Parking, ParkingWithProductsAndPhrases, Phrase, Product, ProductWithTextParameter } from "./types";
 
 export const mapSingleProductToProductWithTextParameters = (parameters: Parameter[], product: Product): ProductWithTextParameter => {
   const parameterObject = parameters.reduce((acc: any, curr: Parameter) => {
