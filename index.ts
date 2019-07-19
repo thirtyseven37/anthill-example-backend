@@ -1,33 +1,9 @@
-import * as _ from "lodash";
-import { filter, map, pluck, share } from "rxjs/operators";
-import { from, interval, Observable, zip } from "rxjs";
-import { AntConfig, AntSourceEvent, fromObservable } from "@thirtyseven37/anthill";
 import * as R from "ramda";
-
-interface Product {
-  id: number;
-  name: string;
-  parameters: number[];
-}
-
-interface ProductWithTextParameter extends Product{
-  textParameters: string[];
-}
-
-interface Parameter {
-  id: number;
-  name: string;
-}
-
-interface Parking {
-  id: number;
-  products: number[];
-}
-
-interface ParkingWithProducts extends Parking {
-  id: number;
-  productsWithTextParameters: ProductWithTextParameter[];
-}
+import * as _ from "lodash";
+import { from, interval, Observable, zip } from "rxjs";
+import { filter, map, pluck, share } from "rxjs/operators";
+import { AntConfig, AntSourceEvent, fromObservable } from "@thirtyseven37/anthill";
+import {Product, ProductWithTextParameter, Parameter, Parking, ParkingWithProducts } from "./types";
 
 const products: Product[] = _.shuffle([
   {id: 600, name: 'ax-176', parameters: [8, 2, 4]},
