@@ -31,8 +31,6 @@ export const mapSingleParkingToParkingWithProducts = (products: ProductWithTextP
     }
   }, {});
 
-  console.log(phrases);
-
   const phrasesObject = phrases.reduce((acc: any, curr: Phrase) => {
     return {
       ...acc,
@@ -73,3 +71,5 @@ export const parkingsWithProductsHandler = (products: ProductWithTextParameter[]
 
   return [parkingWithProducts];
 };
+
+export const sapDataToHumanLanguage = R.identity;

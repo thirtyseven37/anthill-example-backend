@@ -1,12 +1,17 @@
 import { AntConfig } from "@thirtyseven37/anthill";
-import { parkingsWithProductsHandler, productCountHandler, productWithParameterHandler } from "./handlers";
+import {
+  parkingsWithProductsHandler,
+  productCountHandler,
+  productWithParameterHandler,
+  sapDataToHumanLanguage
+} from "./handlers";
 
-export const intervalTime = 20;
+export const intervalTime = 750;
 
 export const antConfig: AntConfig = {
   sources: [
-    { name: "products", toResult: true, ifMissing: [] },
-    { name: "parameters", toResult: true },
+    { name: "products", toResult: true , modifiers: [sapDataToHumanLanguage]},
+    { name: "parameters", toResult: true, ifMissing: [] },
     { name: "parkings", toResult: true },
     { name: "cs_phrase", toResult: true },
     { name: "test1", toResult: true },

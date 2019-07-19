@@ -3,7 +3,7 @@ import { AntSourceEvent } from "@thirtyseven37/anthill";
 import { Parameter, Parking, Phrase, Product } from "./types";
 
 const products: Product[] = _.shuffle([
-  { id: 600, name: "ax-176", parameters: [8, 2, 4] },
+  { id: 600, name: "ax-176", parameters: [2, 4, 8] },
   { id: 2137, name: "1n4002", parameters: [] },
   { id: 37, name: "1n4005", parameters: [21, 37] },
 ]);

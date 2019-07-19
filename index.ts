@@ -1,6 +1,6 @@
 import { from, interval, Observable, zip } from "rxjs";
-import { filter, map, pluck, share } from "rxjs/operators";
-import { AntSourceEvent, fromObservable } from "@thirtyseven37/anthill";
+import { catchError, filter, map, pluck, share } from "rxjs/operators";
+import { AntEvent, AntSourceEvent, fromObservable } from "@thirtyseven37/anthill";
 
 import { events } from "./mock_data";
 import { antConfig, intervalTime } from "./config";
@@ -19,7 +19,11 @@ const searchWithInterval$: Observable<AntSourceEvent> = zip(from(events), timer$
 
 const result$ = fromObservable(searchWithInterval$, antConfig).pipe(share());
 
-result$.subscribe(x => console.log(x.name, x.payload));
+result$.subscribe(
+  (x: AntEvent) => console.log(x.name, x.payload),
+  (err) => console.error(`error catched: ${err}`),
+  () => console.log('STREAM COMPLETE')
+);
 
 const productsWithParams$ = result$.pipe(
   filter(x => x.name === "products_with_parameters"),
