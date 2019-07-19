@@ -3,40 +3,39 @@ import * as _ from "lodash";
 import { from, interval, Observable, zip } from "rxjs";
 import { filter, map, pluck, share } from "rxjs/operators";
 import { AntConfig, AntSourceEvent, fromObservable } from "@thirtyseven37/anthill";
-import {Product, ProductWithTextParameter, Parameter, Parking, ParkingWithProducts } from "./types";
+import { Product, ProductWithTextParameter, Parameter, Parking, ParkingWithProducts } from "./types";
 
 const products: Product[] = _.shuffle([
-  {id: 600, name: 'ax-176', parameters: [8, 2, 4]},
-  {id: 2137, name: '1n4002', parameters: []},
-  {id: 37, name: '1n4005', parameters: [21, 37]},
+  { id: 600, name: "ax-176", parameters: [8, 2, 4] },
+  { id: 2137, name: "1n4002", parameters: [] },
+  { id: 37, name: "1n4005", parameters: [21, 37] },
 ]);
 
 const parameters: Parameter[] = _.shuffle([
-  {id: 2, name: 'resistance'},
-  {id: 4, name: 'power'},
-  {id: 8, name: 'colour'},
-  {id: 21, name: 'voltage'},
-  {id: 37, name: 'max current'},
+  { id: 2, name: "resistance" },
+  { id: 4, name: "power" },
+  { id: 8, name: "colour" },
+  { id: 21, name: "voltage" },
+  { id: 37, name: "max current" },
 ]);
 
 const parkings: Parking[] = _.shuffle([
-  {id: 1, products: [600, 37]},
-  {id: 2, products: []}
+  { id: 1, products: [600, 37] },
+  { id: 2, products: [] }
 ]);
 
-
 const productsEvent: AntSourceEvent = {
-  name: 'products',
+  name: "products",
   payload: products
 };
 
 const parametersEvent: AntSourceEvent = {
-  name: 'parameters',
+  name: "parameters",
   payload: parameters
 };
 
 const parkingsEvent: AntSourceEvent = {
-  name: 'parkings',
+  name: "parkings",
   payload: parkings
 };
 
@@ -44,11 +43,10 @@ const shuffledEvents: AntSourceEvent[] = _.shuffle([
   productsEvent,
   parametersEvent,
   parkingsEvent,
-  { name: 'test1', payload: null },
-  { name: 'test2', payload: null },
-  { name: 'test3', payload: null }
+  { name: "test1", payload: null },
+  { name: "test2", payload: null },
+  { name: "test3", payload: null }
 ]);
-
 
 const timer$ = interval(600);
 
@@ -119,24 +117,23 @@ const parkingsWithProductsHandler = (products: ProductWithTextParameter[], parki
   return [parkingWithProducts];
 };
 
-
 const antConfig: AntConfig = {
   sources: [
-    { name: 'products', toResult: true, ifMissing: [] },
-    { name: 'parameters', toResult: true },
-    { name: 'parkings', toResult: true },
-    { name: 'test1', toResult: true },
-    { name: 'test2', toResult: true },
-    { name: 'test3', toResult: true }
+    { name: "products", toResult: true, ifMissing: [] },
+    { name: "parameters", toResult: true },
+    { name: "parkings", toResult: true },
+    { name: "test1", toResult: true },
+    { name: "test2", toResult: true },
+    { name: "test3", toResult: true }
   ],
   results: [
     {
-      args: [{ name: 'products' }, { name: 'parameters'}],
-      parts: [{ name: 'products_with_parameters', toResult: true }],
+      args: [{ name: "products" }, { name: "parameters"}],
+      parts: [{ name: "products_with_parameters", toResult: true }],
       handler: productWithParameterHandler
     }, {
-      args: [{ name: 'products_with_parameters' }, { name: 'parkings'}],
-      parts: [{ name: 'parkings_with_products', toResult: true }],
+      args: [{ name: "products_with_parameters" }, { name: "parkings"}],
+      parts: [{ name: "parkings_with_products", toResult: true }],
       handler: parkingsWithProductsHandler
     }
   ]
@@ -155,16 +152,15 @@ result$
 
 const productsWithParams$ = result$
   .pipe(
-    filter(x => x.name === 'products_with_parameters'),
-    pluck('payload')
+    filter(x => x.name === "products_with_parameters"),
+    pluck("payload")
   );
 
 const parkingWithProducts$ = result$
   .pipe(
-    filter(x => x.name === 'parkings_with_products'),
-    pluck('payload')
+    filter(x => x.name === "parkings_with_products"),
+    pluck("payload")
   );
 
 parkingWithProducts$
   .subscribe(console.log);
-
