@@ -2,142 +2,28 @@ import * as R from "ramda";
 import * as _ from "lodash";
 import { from, interval, Observable, zip } from "rxjs";
 import { filter, map, pluck, share } from "rxjs/operators";
-import { AntConfig, AntSourceEvent, fromObservable } from "@thirtyseven37/anthill";
-import { Product, ProductWithTextParameter, Parameter, Parking, ParkingWithProducts } from "./types";
+import { AntSourceEvent, fromObservable } from "@thirtyseven37/anthill";
+import { events } from "./mock_data";
+import { antConfig, intervalTime } from "./config";
 
-const products: Product[] = _.shuffle([
-  { id: 600, name: "ax-176", parameters: [8, 2, 4] },
-  { id: 2137, name: "1n4002", parameters: [] },
-  { id: 37, name: "1n4005", parameters: [21, 37] },
-]);
+import {
+Product,
+ProductWithTextParameter,
+Parameter,
+Parking,
+ParkingWithProductsAndPhrases,
+Phrase
+} from "./types";
 
-const parameters: Parameter[] = _.shuffle([
-  { id: 2, name: "resistance" },
-  { id: 4, name: "power" },
-  { id: 8, name: "colour" },
-  { id: 21, name: "voltage" },
-  { id: 37, name: "max current" },
-]);
-
-const parkings: Parking[] = _.shuffle([
-  { id: 1, products: [600, 37] },
-  { id: 2, products: [] }
-]);
-
-const productsEvent: AntSourceEvent = {
-  name: "products",
-  payload: products
-};
-
-const parametersEvent: AntSourceEvent = {
-  name: "parameters",
-  payload: parameters
-};
-
-const parkingsEvent: AntSourceEvent = {
-  name: "parkings",
-  payload: parkings
-};
-
-const shuffledEvents: AntSourceEvent[] = _.shuffle([
-  productsEvent,
-  parametersEvent,
-  parkingsEvent,
-  { name: "test1", payload: null },
-  { name: "test2", payload: null },
-  { name: "test3", payload: null }
-]);
-
-const timer$ = interval(600);
+const timer$ = interval(intervalTime);
 
 const searchWithInterval$: Observable<AntSourceEvent> =
   zip(
-    from(shuffledEvents),
+    from(events),
     timer$
   ).pipe(
     map(x => x[0] as AntSourceEvent)
   );
-
-
-const mapSingleProductToProductWithTextParameters = (parameters: Parameter[], product: Product): ProductWithTextParameter => {
-  const parameterObject = parameters.reduce((acc: any, curr: Parameter) => {
-    return {
-      ...acc,
-      [curr.id]: curr.name
-    }
-  }, {});
-
-  const textParameters = product.parameters.map((parameterId: number): string => {
-    if (!parameterObject.hasOwnProperty(parameterId)) {
-      throw new Error(`Missing parameter name for product ${product.id} (${product.name}) and parameter ${parameterId}`)
-    }
-
-    return parameterObject[parameterId];
-  });
-
-  return {
-    ...product,
-    textParameters
-  }
-};
-
-const mapSingleParkingToParkingWithProducts = (products: ProductWithTextParameter[], parking: Parking): ParkingWithProducts => {
-  const productsObject = products.reduce((acc: any, curr: ProductWithTextParameter) => {
-    return {
-      ...acc,
-      [curr.id]: curr
-    }
-  }, {});
-
-  const productsWithTextParameters = parking.products.map((productId: number): ProductWithTextParameter => {
-    if (!productsObject.hasOwnProperty(productId)) {
-      throw new Error(`Missing product id for parking ${parking.id} and product ${productId}`)
-    }
-
-    return productsObject[productId];
-  });
-
-  return {
-    ...parking,
-    productsWithTextParameters
-  }
-};
-
-const productWithParameterHandler = (products: Product[], params: Parameter[]): [ProductWithTextParameter[]] => {
-  const prodWithParam: ProductWithTextParameter[] = products
-    .map(R.curry(mapSingleProductToProductWithTextParameters)(params));
-
-  return [prodWithParam];
-};
-
-const parkingsWithProductsHandler = (products: ProductWithTextParameter[], parkings: Parking[]): [ParkingWithProducts[]] => {
-  const parkingWithProducts: ParkingWithProducts[] = parkings
-    .map(R.curry(mapSingleParkingToParkingWithProducts)(products));
-
-  return [parkingWithProducts];
-};
-
-const antConfig: AntConfig = {
-  sources: [
-    { name: "products", toResult: true, ifMissing: [] },
-    { name: "parameters", toResult: true },
-    { name: "parkings", toResult: true },
-    { name: "test1", toResult: true },
-    { name: "test2", toResult: true },
-    { name: "test3", toResult: true }
-  ],
-  results: [
-    {
-      args: [{ name: "products" }, { name: "parameters"}],
-      parts: [{ name: "products_with_parameters", toResult: true }],
-      handler: productWithParameterHandler
-    }, {
-      args: [{ name: "products_with_parameters" }, { name: "parkings"}],
-      parts: [{ name: "parkings_with_products", toResult: true }],
-      handler: parkingsWithProductsHandler
-    }
-  ]
-};
 
 const result$ = fromObservable(searchWithInterval$, antConfig)
   .pipe(
@@ -146,13 +32,19 @@ const result$ = fromObservable(searchWithInterval$, antConfig)
 
 result$
   .pipe(
-    map(x => x.name)
+    // map(x => x.name)
   )
-  .subscribe(console.log);
+  .subscribe(x => console.log(x.name, x.payload));
 
 const productsWithParams$ = result$
   .pipe(
     filter(x => x.name === "products_with_parameters"),
+    pluck("payload")
+  );
+
+const products$ = result$
+  .pipe(
+    filter(x => x.name === "products"),
     pluck("payload")
   );
 
@@ -162,5 +54,110 @@ const parkingWithProducts$ = result$
     pluck("payload")
   );
 
+const parkings$ = result$
+  .pipe(
+    filter(x => x.name === "parkings"),
+    pluck("payload")
+  );
+
+
+const productCount$ = result$
+  .pipe(
+    filter(x => x.name === "product_count"),
+    pluck("payload")
+  );
+
+const phrases$ = result$
+  .pipe(
+    filter(x => x.name === "cs_phrase"),
+    pluck("payload")
+  );
+
+productCount$
+  .subscribe((count: any) => {
+    document.getElementById("productCount").innerText = count;
+  });
+
+productsWithParams$
+  .subscribe((products: ProductWithTextParameter[]) => {
+    // document.getElementById("productsWithParams").innerText = products as any;
+  });
+
+parkings$
+  .subscribe((parkings: Parking[]) => {
+    parkings
+      .map((parking: Parking) => `
+        <tr>
+          <td width="5%"><i class="fa fa-bell-o"></i></td>
+          <td>${parking.id}</td>
+          <td>${parking.csPhrase}</td>
+          <td>${parking.products}</td>
+        </tr>
+      `)
+      .forEach((html: any) => {
+        document.getElementById("parkings").innerHTML += html;
+      })
+  });
+
 parkingWithProducts$
-  .subscribe(console.log);
+  .subscribe((parkings: ParkingWithProductsAndPhrases[]) => {
+    document.getElementById("parkings").innerHTML = '';
+
+    parkings
+      .map((parking: ParkingWithProductsAndPhrases) => `
+        <tr>
+          <td width="5%"><i class="fa fa-bell-o"></i></td>
+          <td>${parking.id}</td>
+          <td>${parking.name}</td>
+          <td>${parking.productsWithTextParameters.map(x => x.name)}</td>
+          <td>${parking.productsWithTextParameters.map(x => x.textParameters)}</td>
+        </tr>
+      `)
+      .forEach((html: any) => {
+        document.getElementById("parkings").innerHTML += html;
+      })
+  });
+
+products$
+  .subscribe((products: Product[]) => {
+    products
+      .map((prod: Product) => `
+        <tr>
+          <td width="5%"><i class="fa fa-bell-o"></i></td>
+          <td>${prod.name}</td>
+          <td>${prod.parameters}</td>
+        </tr>
+      `)
+      .forEach((html: any) => {
+        // console.log(html);
+        document.getElementById("products").innerHTML += html;
+      })
+  });
+
+phrases$
+  .subscribe((phrases: Phrase[]) => {
+    document.getElementById("cs-phrases").innerHTML = '';
+    phrases
+      .forEach((phrase: any) => {
+        // console.log(html);
+        document.getElementById("cs-phrases").innerHTML += JSON.stringify(phrase);
+      })
+  });
+
+productsWithParams$
+  .subscribe((products: ProductWithTextParameter[]) => {
+    document.getElementById("products").innerHTML = '';
+
+    products
+      .map((prod: ProductWithTextParameter) => `
+        <tr>
+          <td width="5%"><i class="fa fa-bell-o"></i></td>
+          <td>${prod.name}</td>
+          <td>${prod.textParameters}</td>
+        </tr>
+      `)
+      .forEach((html: any) => {
+        // console.log(html);
+        document.getElementById("products").innerHTML += html;
+      })
+  });

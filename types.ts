@@ -16,9 +16,16 @@ export interface Parameter {
 export interface Parking {
   id: number;
   products: number[];
+  csPhrase: number;
 }
 
-export interface ParkingWithProducts extends Parking {
+export interface Phrase {
   id: number;
+  phrase: string;
+}
+
+export interface ParkingWithProductsAndPhrases extends Parking {
+  id: number;
+  name: string;
   productsWithTextParameters: ProductWithTextParameter[];
 }
