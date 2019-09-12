@@ -9,7 +9,8 @@ import {
   ProductWithTextParameter,
   Parking,
   ParkingWithProductsAndPhrases,
-  Phrase
+  Phrase,
+  Parameter
 } from "./types";
 
 const timer$ = interval(intervalTime);
@@ -56,6 +57,11 @@ const phrases$ = result$.pipe(
   pluck("payload")
 );
 
+const parameters$ = result$.pipe(
+  filter(x => x.name === "parameters"),
+  pluck("payload")
+);
+
 productCount$.subscribe((count: any) => document.getElementById("productCount").innerText = count);
 
 phrases$.subscribe((phrases: Phrase[]) => {
@@ -96,18 +102,6 @@ parkingWithProducts$.subscribe((parkings: ParkingWithProductsAndPhrases[]) => {
     })
 });
 
-products$.subscribe((products: Product[]) => {
-  products
-    .map((prod: Product) => `
-      <tr>
-        <td width="5%"><i class="fa fa-bell-o"></i></td>
-        <td>${prod.name}</td>
-        <td>${prod.parameters}</td>
-      </tr>
-    `)
-    .forEach((html: any) => document.getElementById("products").innerHTML += html);
-});
-
 productsWithParams$.subscribe((products: ProductWithTextParameter[]) => {
   document.getElementById("products").innerHTML = '';
 
@@ -120,4 +114,28 @@ productsWithParams$.subscribe((products: ProductWithTextParameter[]) => {
       </tr>
     `)
     .forEach((html: any) => document.getElementById("products").innerHTML += html);
+});
+
+products$.subscribe((products: Product[]) => {
+  products
+      .map((prod: Product) => `
+      <tr>
+        <td width="5%"><i class="fa fa-bell-o"></i></td>
+        <td>${prod.name}</td>
+        <td>${prod.parameters}</td>
+      </tr>
+    `)
+      .forEach((html: any) => document.getElementById("products").innerHTML += html);
+});
+
+parameters$.subscribe((parameters: Parameter[]) => {
+  parameters
+      .map((param: Parameter) => `
+      <tr>
+        <td width="5%"><i class="fa fa-bell-o"></i></td>
+        <td>${param.id}</td>
+        <td>${param.name}</td>
+      </tr>
+    `)
+      .forEach((html: any) => document.getElementById("parameters").innerHTML += html);
 });

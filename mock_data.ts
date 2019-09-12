@@ -53,15 +53,21 @@ export const events: AntSourceEvent[] = _.shuffle([
   phrasesEvent,
   { name: "test1", payload: null },
   { name: "test2", payload: null },
-  { name: "test3", payload: null }
+  { name: "test3", payload: null },
+  { name: "test4", payload: null },
+  { name: "test5", payload: null },
+  { name: "test6", payload: null }
 ]);
 
 // export const events: AntSourceEvent[] = [
-//   productsEvent,
-//   parametersEvent,
-//   parkingsEvent,
-//   phrasesEvent,
-//   { name: "test1", payload: null },
-//   { name: "test2", payload: null },
-//   { name: "test3", payload: null }
+// productsEvent,
+//     parametersEvent,
+//     parkingsEvent,
+//     phrasesEvent,
+//     { name: "test1", payload: null },
+//     { name: "test2", payload: null },
+//     { name: "test3", payload: null },
+//     { name: "test4", payload: null },
+//     { name: "test5", payload: null },
+//     { name: "test6", payload: null }
 // ];

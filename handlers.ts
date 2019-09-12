@@ -53,10 +53,7 @@ export const mapSingleParkingToParkingWithProducts = (products: ProductWithTextP
   }
 };
 
-export const productCountHandler = (products: Product[]): [number] => {
-
-  return [products.length];
-};
+export const productCountHandler = (products: Product[]): [number] => [products.length];
 
 export const productWithParameterHandler = (products: Product[], params: Parameter[]): [ProductWithTextParameter[]] => {
   const prodWithParam: ProductWithTextParameter[] = products

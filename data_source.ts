@@ -1,9 +1,23 @@
 import { from, merge } from "rxjs";
-import { map } from "rxjs/operators";
+import {map, reduce} from "rxjs/operators";
+import { fromObservable } from "@thirtyseven37/anthill";
 
-merge(
-  wsCall(`wss://search.tme.eu/products`).pipe(map(mapProductsToAnthillEvent)),
-  httpCall(`https://api.tme.eu/parkings`).pipe(map(mapParkingsToAnthillEvent)),
-  dbQuery(`SELECT * FROM phrases`).pipe(map(mapPhraseQueryToAnthillEvent)),
+const dataSource$ = merge(
+  wsCall(`wss://search.tme.eu/products`, searchRequest).pipe(map(mapProductsToAnthillEvent)),
+  httpCall(`https://api.tme.eu/parkings`, tmeRequest).pipe(map(mapParkingsToAnthillEvent)),
+  httpCall(`https://weather.com/api`, weatherRequest).pipe(map(mapWeatherToAnthillEvent)),
+  dbQuery(`SELECT * FROM phrases WHERE lang = ?`, ['en']).pipe(map(mapPhraseQueryToAnthillEvent)),
   from(getArrayFromConfig).pipe(map(mapConfigToAnthillEvent))
 );
+
+const result$ = fromObservable(dataSource$, config);
+
+if (ws) {
+    result$.subscribe(wsClient);
+
+} else if (http) {
+    result$.pipe(
+        reduce(allDataToSingleResponse)
+    ).subscribe(httpResponse)
+}
+

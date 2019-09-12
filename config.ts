@@ -6,7 +6,7 @@ import {
   sapDataToHumanLanguage
 } from "./handlers";
 
-export const intervalTime = 750;
+export const intervalTime = 1750;
 
 export const antConfig: AntConfig = {
   sources: [
